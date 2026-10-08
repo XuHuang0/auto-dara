@@ -1,0 +1,6 @@
+pattern,output,precursors,target,method,temperature,atmosphere,phases
+data/tutorial1_La-Fe-O.xrdml,results/step4,"La2O3, Fe2O3",LaFeO3,solid-state synthesis in a box furnace,1100 C for 12 h,air,
+data/tutorial2_Zn-Al-O_a.xrdml,results/step4,"ZnO, Al2O3",ZnAl2O4,solid-state synthesis in a box furnace,,air,
+data/tutorial2_Zn-Al-O_b.xrdml,results/step4,"ZnO, Al2O3",ZnAl2O4,solid-state synthesis in a box furnace,,air,
+data/tutorial3_Sr-Nb-O.xrdml,results/step4,"SrCO3, Nb2O5",Sr2Nb2O7,solid-state synthesis in a box furnace,1025 C,air,
+data/tutorial3_Sr-Nb-O.xrdml,results/step4,,,,,,best

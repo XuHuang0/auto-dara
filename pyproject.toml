@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto-dara"
+version = "0.1.0"
+description = "Automated phase identification and Rietveld refinement of ex situ powder XRD with dara"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Lauren Walters", email = "lnw.materials@gmail.com" }]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+dependencies = [
+    "dara-xrd>=1.2.0",
+    "numpy<2",
+    "scipy<1.18",
+    "pymatgen",
+    "joblib",
+    "plotly>=6.0",
+    "kaleido>=1.0",
+    "requests",
+    "google-genai>=1.0",
+    "python-dotenv",
+]
+
+[project.scripts]
+auto-dara = "auto_dara.cli:main"
+
+[tool.setuptools]
+packages = ["auto_dara"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

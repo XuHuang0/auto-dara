@@ -1,0 +1,14 @@
+# API keys and local settings: never commit
+.env
+.env.*
+!.env.example
+*.key
+
+# results and caches
+results/
+__pycache__/
+*.egg-info/
+build/
+dist/
+.DS_Store
+.claude/settings.local.json
