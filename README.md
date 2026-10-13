@@ -19,6 +19,10 @@ pip install -e .
 auto-dara --help
 ```
 
+On an Apple Silicon Mac (M1 or later), dara's refinement engine (BGMN) is Intel-only and runs through Rosetta 2.
+auto-dara checks for Rosetta when you run a search and offers to install it if it's missing. To install it yourself:
+`softwareupdate --install-rosetta --agree-to-license`.
+
 ## Set up `.env`
 
 From the `auto-dara` folder, run this with your own values filled in:

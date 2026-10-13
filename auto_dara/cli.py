@@ -178,6 +178,10 @@ def main(argv=None):
 
     out = args.out.resolve()
     try:
+        if args.cmd in ("batch", "search", "manual"):
+            from .rosetta import ensure_rosetta
+
+            ensure_rosetta()
         if args.cmd == "batch":
             jobs.run_batch(args.jobs.resolve(), out)
         elif args.cmd == "search":
