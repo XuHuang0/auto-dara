@@ -71,13 +71,33 @@ def _skeleton(struct, dummy_ids):
     return Structure(struct.lattice, species, [s.frac_coords for s in struct])
 
 
-def _distortion(struct, symprec=0.2):
+def _make_matcher(**kwargs):
     from pymatgen.analysis.structure_matcher import StructureMatcher
+
+    class PrereducedMatcher(StructureMatcher):
+        """Expects structures already reduced by `_reduce`. pymatgen's own reduction cache keys on the element
+        set, so every same-system lookup falls back to an O(N^2) site-by-site equality check."""
+
+        @classmethod
+        def _get_reduced_structure(cls, struct, primitive_cell=True, niggli=True):
+            return struct.copy()
+
+    return PrereducedMatcher(**kwargs)
+
+
+def _reduce(struct, primitive_cell=True):
+    # Same reduction StructureMatcher applies before matching (niggli, then primitive cell).
+    reduced = struct.get_reduced_structure(reduction_algo="niggli")
+    return reduced.get_primitive_structure() if primitive_cell else reduced
+
+
+def _distortion(struct, symprec=0.2):
     from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
     try:
         refined = SpacegroupAnalyzer(struct, symprec=symprec).get_refined_structure()
-        rms = StructureMatcher(primitive_cell=False, scale=False).get_rms_dist(struct, refined)
+        matcher = _make_matcher(primitive_cell=False, scale=False)
+        rms = matcher.get_rms_dist(_reduce(struct, primitive_cell=False), _reduce(refined, primitive_cell=False))
         return 999 if rms is None else rms[0]
     except Exception:
         return 999
@@ -98,12 +118,12 @@ class UniquenessResult:
 
 
 def filter_unique(
-    cif_paths, ltol=0.05, stol=0.15, angle_tol=2, symprec=0.01, occ_tol: float | None = None, prefer=lambda p: 0
+    cif_paths, ltol=0.05, stol=0.15, angle_tol=2, symprec=0.01, occ_tol: float | None = None, prefer=lambda p: 0,
+    max_sites=1000,
 ) -> UniquenessResult:
-    from pymatgen.analysis.structure_matcher import StructureMatcher
     from pymatgen.core import Structure
 
-    matcher = StructureMatcher(
+    matcher = _make_matcher(
         ltol=ltol, stol=stol, angle_tol=angle_tol, primitive_cell=True, scale=True, comparator=_make_comparator(occ_tol)
     )
     result = UniquenessResult()
@@ -114,6 +134,10 @@ def filter_unique(
     for path in sorted(map(Path, cif_paths)):
         try:
             raw = Structure.from_file(str(path), primitive=False, sort=False)
+            if max_sites is not None and len(raw) > max_sites:
+                result.kept.append(path)
+                result.log.append(f"[!] kept {path.name} ({len(raw)} sites, too large to compare)")
+                continue
             clean = _clean(raw, symprec)
             key = (
                 clean.composition.reduced_formula
@@ -123,7 +147,7 @@ def filter_unique(
             groups[key].append(
                 {
                     "path": path,
-                    "match": clean if occ_tol is not None else _skeleton(clean, dummy_ids),
+                    "match": _reduce(clean if occ_tol is not None else _skeleton(clean, dummy_ids)),
                     "sg": _spacegroup(clean, symprec),
                     "rank": (prefer(path), _occupancy_deficit(clean), _distortion(raw, symprec), clean.volume),
                 }
