@@ -111,6 +111,18 @@ divergence slit, `ads` automatic).
 | Anton Paar XRDynamic 500 | `ucb-xrdynamic500-anton-paar` |
 | Synchrotron | `synchrotron` |
 
+## Publication plots
+
+```bash
+auto-dara pretty results/scan/scan_rank0.pkl                   # writes scan_rank0_pretty.pdf / .png in the current folder
+auto-dara pretty results/*/*_rank0.pkl --xlim 10 60 -o figures
+```
+
+| option | meaning |
+| --- | --- |
+| `--xlim MIN MAX` | 2θ range to plot (default: the whole scan) |
+| `-o` | output folder (default: the current folder) |
+
 ## Batch runs
 
 ```bash

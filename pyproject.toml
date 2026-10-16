@@ -21,6 +21,7 @@ dependencies = [
     "scipy<1.18",
     "pymatgen",
     "joblib",
+    "pyarrow",
     "plotly>=6.0",
     "kaleido>=1.0",
     "requests",

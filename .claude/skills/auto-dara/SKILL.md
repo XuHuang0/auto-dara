@@ -1,6 +1,6 @@
 ---
 name: auto-dara
-description: Run auto-dara to identify phases and Rietveld-refine ex situ powder XRD patterns (.xrdml, .xy, .raw, .rasx) with dara. Use when asked to analyse, refine or phase-identify XRD scans, run or check a phase search, do a manual refinement, test whether a phase is present, set up a batch job file, or pick an instrument profile.
+description: Run auto-dara to identify phases and Rietveld-refine ex situ powder XRD patterns (.xrdml, .xy, .raw, .rasx) with dara. Use when asked to analyse, refine or phase-identify XRD scans, run or check a phase search, do a manual refinement, test whether a phase is present, set up a batch job file, pick an instrument profile, or make a publication-quality refinement plot.
 ---
 
 # auto-dara
@@ -24,6 +24,7 @@ auto-dara search SCAN... -p "PRECURSORS" [-t TARGET] [-m METHOD] [--temp "T, tim
 auto-dara manual SCAN [PHASES...] [--add PHASE...] [-P KEY=VALUE] [-R KEY=VALUE] -o OUT
 auto-dara JOBS.csv                     # batch: one row per scan; rows with `phases` are manual refinements
 auto-dara candidates -p "..." -o OUT   # build and filter the pool only
+auto-dara pretty PKL... [--xlim MIN MAX] [-o OUT]   # publication plot: <pkl>_pretty.pdf + 6000x3000 .png
 auto-dara instruments                  # built-in instrument profiles for -i
 auto-dara params                       # refinement parameter defaults and meanings
 ```

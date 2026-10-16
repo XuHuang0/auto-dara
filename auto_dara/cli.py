@@ -4,6 +4,7 @@ auto-dara search scan.xrdml -p "La2O3, Fe2O3" -t LaFeO3 --temp "1100 C" -o resul
 auto-dara manual scan.xrdml LaFeO3_62 Fe2O3_167 -o results
 auto-dara jobs.csv                      (many searches/refinements from one file)
 auto-dara candidates -p "La2O3, Fe2O3" -o results
+auto-dara pretty results/scan/scan_rank0.pkl         (publication-style PDF + PNG)
 auto-dara instruments
 """
 
@@ -14,7 +15,7 @@ from pathlib import Path
 
 from .config import Settings
 
-COMMANDS = {"search", "manual", "batch", "candidates", "instruments", "params", "-h", "--help"}
+COMMANDS = {"search", "manual", "batch", "candidates", "pretty", "instruments", "params", "-h", "--help"}
 
 
 def _parsers():
@@ -116,6 +117,10 @@ def _parsers():
     p.add_argument("--add", nargs="+", default=[], metavar="PHASE", help="phases to add, e.g. to test the target")
     p = sub.add_parser("batch", parents=[out], help="run every job in a .csv or .json file (see README)")
     p.add_argument("jobs", type=Path, help="job file; `auto-dara jobs.csv` is a shortcut for this")
+    p = sub.add_parser("pretty", help="publication-style plot (PDF + high-res PNG) of saved refinements")
+    p.add_argument("pkls", nargs="+", type=Path, help="result .pkl files, e.g. results/scan/scan_rank0.pkl")
+    p.add_argument("--xlim", nargs=2, type=float, metavar=("MIN", "MAX"), help="2-theta range (default: all)")
+    p.add_argument("-o", "--out", type=Path, default=Path("."), help="output folder (default: current folder)")
     sub.add_parser("instruments", help="list the instrument profiles you can pass to -i")
     sub.add_parser("params", help="show the default refinement parameters and what they mean")
     return root
@@ -126,6 +131,17 @@ def _instruments():
 
     print("\n".join(list_profiles()))
     print("\nUse one with -i NAME. Default: Aeris-fds-Pixcel1d-Medipix3.")
+
+
+def _pretty(args):
+    from .pretty import save_pretty
+
+    for pkl in args.pkls:
+        try:
+            pdf, png = save_pretty(pkl, args.out, args.xlim)
+        except (FileNotFoundError, ValueError, ModuleNotFoundError) as exc:
+            sys.exit(f"Error: {pkl}: {exc}")
+        print(f"{pdf}\n{png}")
 
 
 def _params():
@@ -167,6 +183,8 @@ def main(argv=None):
         return _instruments()
     if args.cmd == "params":
         return _params()
+    if args.cmd == "pretty":
+        return _pretty(args)
     try:
         sys.stdout.reconfigure(line_buffering=True)
     except Exception:
